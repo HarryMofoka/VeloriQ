@@ -120,7 +120,7 @@ function drawLuxuryFace(ctx: CanvasRenderingContext2D, accent: THREE.Color, t: n
 
   // Brand
   ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '500 26px "Space Grotesk",sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('F O S S I L', cx, cy - 170);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('V E L O R I Q', cx, cy - 170);
 
   // Time
   const [hrs, mins] = time.split(':');
@@ -295,7 +295,7 @@ function drawClassicFace(ctx: CanvasRenderingContext2D, accent: THREE.Color, t: 
   // Brand
   ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = '400 24px "Space Grotesk",sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('F O S S I L', cx, cy - 120);
+  ctx.fillText('V E L O R I Q', cx, cy - 120);
 
   // Time — elegant serif-like
   const [hrs, mins] = time.split(':');

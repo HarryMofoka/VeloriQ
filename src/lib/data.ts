@@ -19,7 +19,7 @@ export interface Product {
 export const products: Product[] = [
   {
     id: 1,
-    name: 'FOSSIL',
+    name: 'VeloriQ',
     subtitle: 'Super Luxury',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. sed diam nonumy eirmod tempor.',
     price: '$399',
@@ -36,7 +36,7 @@ export const products: Product[] = [
   },
   {
     id: 2,
-    name: 'FOSSIL',
+    name: 'VeloriQ',
     subtitle: 'Sport Active',
     description: 'Lightweight aluminum case and silicone strap designed for your toughest workouts.',
     price: '$299',
@@ -53,7 +53,7 @@ export const products: Product[] = [
   },
   {
     id: 3,
-    name: 'FOSSIL',
+    name: 'VeloriQ',
     subtitle: 'Classic Elegance',
     description: 'Stainless steel finish with a minimalist digital face respecting traditional craft.',
     price: '$449',
@@ -70,7 +70,7 @@ export const products: Product[] = [
   },
   {
     id: 4,
-    name: 'FOSSIL',
+    name: 'VeloriQ',
     subtitle: 'Tactical Stealth',
     description: 'Matte finish with military-grade durability and extended battery life.',
     price: '$349',
@@ -87,7 +87,7 @@ export const products: Product[] = [
   },
   {
     id: 5,
-    name: 'FOSSIL',
+    name: 'VeloriQ',
     subtitle: 'Midnight Noir',
     description: 'Pure black ceramic with sapphire crystal glass. Understated luxury redefined.',
     price: '$549',

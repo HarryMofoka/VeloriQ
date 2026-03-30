@@ -88,7 +88,7 @@ export function HtmlOverlay({ activeSection }: { activeSection: number }) {
       <header className="site-header" id="site-header">
         <div className="brand-group">
           <Menu className="hamburger" size={20} />
-          <h1>S'wisp</h1>
+          <h1>VeloriQ</h1>
         </div>
         <nav className="nav-links">
           <a href="#" className="active">Men</a>
