@@ -28,6 +28,7 @@ export function HtmlOverlay({ activeSection }: { activeSection: number }) {
   useEffect(() => {
     let raf: number;
     const sync = () => {
+      const isMobile = window.innerWidth <= 768;
       const hex = '#' + watchState.colors.backdrop.getHexString();
       if (backdropRef.current) backdropRef.current.style.backgroundColor = hex;
       if (cutoutLeftRef.current) cutoutLeftRef.current.style.backgroundColor = hex;
@@ -55,7 +56,9 @@ export function HtmlOverlay({ activeSection }: { activeSection: number }) {
 
         if (opacity > 0) {
           el.style.opacity = opacity.toString();
-          el.style.transform = `translateY(calc(-50% + ${yOffset}px))`;
+          el.style.transform = isMobile 
+            ? `translateY(${yOffset}px)`
+            : `translateY(calc(-50% + ${yOffset}px))`;
           el.style.pointerEvents = opacity > 0.8 ? 'auto' : 'none';
           el.style.visibility = 'visible';
         } else {

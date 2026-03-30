@@ -523,10 +523,41 @@ html { scrollbar-width: none; }
   .scroll-indicator { right: 24px; }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .step-nav { display: none; }
-  .content-slide { right: 16px; left: 16px; max-width: none; bottom: 60px; top: auto; transform: none; }
-  .content-slide.visible { transform: none; }
+  .content-slide { 
+    right: 24px; left: 24px; 
+    max-width: none; 
+    bottom: 80px; 
+    top: auto; 
+    transform: none; 
+    text-align: center;
+  }
+  .content-slide.content-left, .content-slide.content-right {
+    text-align: center;
+  }
+  .sw-label {
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .sw-label .vline {
+    display: none;
+  }
+  .sw-label span {
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: 0.75rem;
+  }
+  .watch-title {
+    font-size: 2.8rem;
+  }
+  .watch-desc {
+    margin: 0 auto 28px auto;
+  }
+  .cta-btn {
+    width: 100%;
+    justify-content: center;
+  }
   .cutout-left, .cutout-right { display: none; }
 }
 

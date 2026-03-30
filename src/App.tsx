@@ -40,6 +40,8 @@ export default function App() {
       },
     });
 
+    const isMobile = window.innerWidth <= 768;
+
     // Build states — watch alternates left/right based on product.watchSide
     const states = products.map((p) => ({
       rotation: new THREE.Euler(
@@ -48,11 +50,15 @@ export default function App() {
         0,
       ),
       position: new THREE.Vector3(
-        p.watchSide === 'left' ? -1.2 : 1.6,
-        0,
+        isMobile ? 0 : (p.watchSide === 'left' ? -1.2 : 1.6),
+        isMobile ? 1.0 : 0,
         0
       ),
-      scale: new THREE.Vector3(1, 1, 1),
+      scale: new THREE.Vector3(
+        isMobile ? 0.85 : 1, 
+        isMobile ? 0.85 : 1, 
+        isMobile ? 0.85 : 1
+      ),
       colors: {
         case: new THREE.Color(p.caseColor),
         strap: new THREE.Color(p.strapColor),
