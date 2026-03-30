@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { CanvasContainer } from './components/CanvasContainer';
 import { HtmlOverlay } from './components/HtmlOverlay';
+import { CartDrawer } from './components/CartDrawer';
+import { MenuDrawer } from './components/MenuDrawer';
+import { SearchModal } from './components/SearchModal';
+import { UserOverlay } from './components/UserOverlay';
 import { ReactLenis as Lenis } from 'lenis/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -107,6 +111,12 @@ export default function App() {
         barStyles={{ background: '#fff', height: '2px' }}
         dataStyles={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontFamily: 'Space Grotesk', letterSpacing: '0.2em' }}
       />
+
+      {/* Global Modals floating outside the 3D scroll tree */}
+      <CartDrawer />
+      <MenuDrawer />
+      <SearchModal />
+      <UserOverlay />
     </>
   );
 }

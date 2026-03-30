@@ -529,3 +529,47 @@ html { scrollbar-width: none; }
   .content-slide.visible { transform: none; }
   .cutout-left, .cutout-right { display: none; }
 }
+
+/* ========================================
+   CUSTOM SCROLLBAR FOR DRAWERS
+   ======================================== */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ========================================
+   PREMIUM OVERLAY PANEL (For Drawers & Modals)
+   ======================================== */
+.premium-panel {
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 80%),
+    linear-gradient(135deg, #1e1e1e 0%, #111 100%);
+  overflow: hidden;
+}
+
+.premium-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.premium-panel > * {
+  position: relative;
+  z-index: 1;
+}

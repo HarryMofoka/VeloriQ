@@ -2,10 +2,12 @@ import React, { useRef, useEffect } from 'react';
 import { products } from '../lib/data';
 import { watchState } from '../lib/store';
 import { usePricing } from '../lib/usePricing';
+import { uiActions, useUIState } from '../lib/uiStore';
 import { ShoppingCart, User, Search, Menu } from 'lucide-react';
 
 export function HtmlOverlay({ activeSection }: { activeSection: number }) {
   const { formatPrice } = usePricing();
+  const { cartItems } = useUIState();
   const cursorRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
   const cutoutLeftRef = useRef<HTMLDivElement>(null);
@@ -89,17 +91,27 @@ export function HtmlOverlay({ activeSection }: { activeSection: number }) {
       {/* ── Header ───────────────────────────────── */}
       <header className="site-header" id="site-header">
         <div className="brand-group">
-          <Menu className="hamburger" size={20} />
+          <Menu onClick={uiActions.toggleMenu} className="hamburger cursor-pointer hover:scale-110 transition-transform" size={20} />
           <h1>VeloriQ</h1>
         </div>
         <nav className="nav-links">
-          <a href="#" className="active">Men</a>
-          <a href="#">Women</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); uiActions.toggleMenu(); }} className="active">Men</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); uiActions.toggleMenu(); }}>Women</a>
         </nav>
         <div className="header-actions">
-          <Search size={18} />
-          <User size={18} />
-          <ShoppingCart size={18} />
+          <Search onClick={uiActions.toggleSearch} className="cursor-pointer hover:scale-110 transition-transform" size={18} />
+          <User onClick={uiActions.toggleUser} className="cursor-pointer hover:scale-110 transition-transform" size={18} />
+          <div className="relative">
+            <ShoppingCart onClick={uiActions.toggleCart} className="cursor-pointer hover:scale-110 transition-transform" size={18} />
+            {cartItems.length > 0 && (
+              <div 
+                onClick={uiActions.toggleCart} 
+                className="absolute -top-3 -right-3 bg-white text-black text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold cursor-pointer hover:scale-110 transition-transform"
+              >
+                {cartItems.reduce((acc, i) => acc + i.quantity, 0)}
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -139,7 +151,11 @@ export function HtmlOverlay({ activeSection }: { activeSection: number }) {
 
             <p className="watch-desc">{p.description}</p>
 
-            <button className="cta-btn" id={`cta-btn-${p.id}`}>
+            <button 
+              className="cta-btn" 
+              id={`cta-btn-${p.id}`}
+              onClick={() => uiActions.addToCart(p.id)}
+            >
               Add to cart — {formatPrice(p.basePrice)}
             </button>
           </div>
