@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { Loader } from '@react-three/drei';
 
 gsap.registerPlugin(ScrollTrigger);
+gsap.ticker.fps(120);
 
 export default function App() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -27,7 +28,7 @@ export default function App() {
         trigger: containerRef.current,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: 1.2,
+        scrub: 2.5, // Increased scrub duration for smoother interpolation
         onUpdate: (self) => {
           const progress = self.progress;
           const section = Math.max(0, Math.min(
@@ -103,9 +104,22 @@ export default function App() {
     };
   }, []);
 
+  // Sync Lenis with GSAP Ticker at 120 FPS
+  const lenisRef = useRef<any>(null);
+  useEffect(() => {
+    function update(time: number) {
+      lenisRef.current?.lenis?.raf(time * 1000);
+    }
+    gsap.ticker.add(update);
+    gsap.ticker.lagSmoothing(0);
+    return () => {
+      gsap.ticker.remove(update);
+    };
+  }, []);
+
   return (
     <>
-      <Lenis root>
+      <Lenis root ref={lenisRef} autoRaf={false} options={{ lerp: 0.05, wheelMultiplier: 0.8 }}>
         <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
           <CanvasContainer />
           <HtmlOverlay activeSection={activeSection} />
