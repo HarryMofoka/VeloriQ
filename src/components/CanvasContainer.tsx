@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, ContactShadows, PerspectiveCamera, PresentationControls } from '@react-three/drei';
+import { Environment, ContactShadows, PerspectiveCamera } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette, N8AO } from '@react-three/postprocessing';
 import { WatchModel } from './WatchModel';
 import { watchState } from '../lib/store';
@@ -35,15 +35,7 @@ export function CanvasContainer() {
 
         <Environment preset="city" />
 
-        <PresentationControls
-          global
-          snap
-          rotation={[0, 0, 0]}
-          polar={[-Math.PI / 4, Math.PI / 4]}
-          azimuth={[-Math.PI / 3, Math.PI / 3]}
-        >
-          <WatchModel />
-        </PresentationControls>
+        <WatchModel />
 
         <ContactShadows
           position={[0, -2.8, 0]}

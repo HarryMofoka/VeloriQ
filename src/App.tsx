@@ -31,21 +31,23 @@ export default function App() {
             products.length - 1
           );
           setActiveSection(section);
-          // Store progress for screen time/date switching
           watchState.progress = progress;
         },
       },
     });
 
-    // Build states — watch stays in same position, only subtle rotation varies
-    const states = products.map((p, i) => ({
+    // Build states — watch alternates left/right based on product.watchSide
+    const states = products.map((p) => ({
       rotation: new THREE.Euler(
-        0.08 + Math.sin(i * 1.3) * 0.08,   // Very subtle tilt variation
-        -0.25 + Math.cos(i * 0.9) * 0.15,  // Gentle turn
+        0.08 + Math.sin(p.id * 1.3) * 0.08,
+        (p.watchSide === 'left' ? -0.25 : 0.25) + Math.cos(p.id * 0.9) * 0.12,
         0,
       ),
-      // Watch stays slightly left of center — UNIFORM positioning
-      position: new THREE.Vector3(-1.2, 0, 0),
+      position: new THREE.Vector3(
+        p.watchSide === 'left' ? -1.2 : 1.6,
+        0,
+        0
+      ),
       scale: new THREE.Vector3(1, 1, 1),
       colors: {
         case: new THREE.Color(p.caseColor),

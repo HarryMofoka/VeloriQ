@@ -12,6 +12,8 @@ export interface Product {
   backdropColor: string;
   screenTime: string;
   screenDate: string;
+  faceStyle: 'luxury' | 'sport' | 'classic' | 'tactical' | 'noir';
+  watchSide: 'left' | 'right';
 }
 
 export const products: Product[] = [
@@ -29,6 +31,8 @@ export const products: Product[] = [
     backdropColor: '#8b6f5c',
     screenTime: '12:38',
     screenDate: 'WED 8/7',
+    faceStyle: 'luxury',
+    watchSide: 'left',
   },
   {
     id: 2,
@@ -44,6 +48,8 @@ export const products: Product[] = [
     backdropColor: '#c4956a',
     screenTime: '10:56',
     screenDate: 'THU 3/7',
+    faceStyle: 'sport',
+    watchSide: 'right',
   },
   {
     id: 3,
@@ -59,6 +65,8 @@ export const products: Product[] = [
     backdropColor: '#4a6a8a',
     screenTime: '09:24',
     screenDate: 'MON 1/12',
+    faceStyle: 'classic',
+    watchSide: 'left',
   },
   {
     id: 4,
@@ -74,6 +82,8 @@ export const products: Product[] = [
     backdropColor: '#3d6b4f',
     screenTime: '14:07',
     screenDate: 'SAT 5/3',
+    faceStyle: 'tactical',
+    watchSide: 'right',
   },
   {
     id: 5,
@@ -89,5 +99,7 @@ export const products: Product[] = [
     backdropColor: '#5a3d7a',
     screenTime: '22:15',
     screenDate: 'FRI 11/8',
+    faceStyle: 'noir',
+    watchSide: 'left',
   },
 ];

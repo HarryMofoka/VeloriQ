@@ -34,6 +34,8 @@ export function HtmlOverlay({ activeSection }: { activeSection: number }) {
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  const activeSide = products[activeSection]?.watchSide || 'left';
+
   return (
     <>
       {/* ── Layer 0: Colored backdrop ─────────────── */}
@@ -79,13 +81,15 @@ export function HtmlOverlay({ activeSection }: { activeSection: number }) {
         ))}
       </div>
 
-      {/* ── Content slides (right) ───────────────── */}
+      {/* ── Content slides ───────────────────────── */}
       {products.map((p, i) => {
         const isActive = i === activeSection;
+        // Content goes on opposite side from the watch
+        const contentSide = p.watchSide === 'left' ? 'content-right' : 'content-left';
         return (
           <div
             key={p.id}
-            className={`content-slide ${isActive ? 'visible' : i < activeSection ? 'hidden-up' : 'hidden-down'}`}
+            className={`content-slide ${contentSide} ${isActive ? 'visible' : i < activeSection ? 'hidden-up' : 'hidden-down'}`}
           >
             <div className="sw-label">
               <div className="vline" />
@@ -102,7 +106,7 @@ export function HtmlOverlay({ activeSection }: { activeSection: number }) {
 
             <button className="cta-btn" id={`cta-btn-${p.id}`}>
               Add to cart — {p.price}
-              <span className="arrow">→</span>
+              <span className="arrow">\u2192</span>
             </button>
           </div>
         );

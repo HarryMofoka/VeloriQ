@@ -72,7 +72,402 @@ function createStrapTexture() {
   return tex;
 }
 
-/* ── Watch Face Canvas ──────────────────────────────── */
+/* ── Shared helpers ─────────────────────────────────── */
+
+function drawBackground(ctx: CanvasRenderingContext2D, s: number, cx: number, cy: number) {
+  const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 512);
+  bg.addColorStop(0, '#111111');
+  bg.addColorStop(0.8, '#080808');
+  bg.addColorStop(1, '#000000');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, s, s);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 500, 0, Math.PI * 2);
+  ctx.clip();
+}
+
+function accentRgba(color: THREE.Color, a: number): string {
+  return `rgba(${Math.round(color.r * 255)},${Math.round(color.g * 255)},${Math.round(color.b * 255)},${a})`;
+}
+
+/* ══════════════════════════════════════════════════════
+   FACE 1 — LUXURY
+   ══════════════════════════════════════════════════════ */
+function drawLuxuryFace(ctx: CanvasRenderingContext2D, accent: THREE.Color, t: number, time: string, date: string) {
+  const s = 1024, cx = s/2, cy = s/2;
+  const hex = '#' + accent.getHexString();
+  drawBackground(ctx, s, cx, cy);
+
+  // Edge glow
+  const eg = ctx.createRadialGradient(cx, cy, 380, cx, cy, 510);
+  eg.addColorStop(0, 'transparent'); eg.addColorStop(1, accentRgba(accent, 0.08));
+  ctx.fillStyle = eg; ctx.fillRect(0, 0, s, s);
+
+  // Indices
+  ctx.save(); ctx.translate(cx, cy);
+  for (let i = 0; i < 60; i++) {
+    if (i % 5 === 0) { ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fillRect(-2.5, -488, 5, 22); }
+    else { ctx.beginPath(); ctx.arc(0, -480, 1.5, 0, Math.PI*2); ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fill(); }
+    ctx.rotate(Math.PI/30);
+  }
+  ctx.restore();
+
+  // Accent arc
+  const af = 0.65 + Math.sin(t*0.8)*0.1;
+  ctx.beginPath(); ctx.arc(cx, cy, 494, -Math.PI/2, -Math.PI/2 + af*Math.PI*2);
+  ctx.strokeStyle = hex; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.stroke(); ctx.lineCap = 'butt';
+
+  // Brand
+  ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '500 26px "Space Grotesk",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('F O S S I L', cx, cy - 170);
+
+  // Time
+  const [hrs, mins] = time.split(':');
+  ctx.fillStyle = '#fff'; ctx.font = '200 260px "Inter",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(hrs, cx, cy - 20);
+  ctx.font = '200 260px "Inter",sans-serif';
+  const hw = ctx.measureText(hrs).width;
+  ctx.font = '600 100px "Inter",sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillText(mins, cx + hw/2 + 6, cy - 120);
+
+  // Pulsing colon
+  ctx.globalAlpha = 0.3 + Math.abs(Math.sin(t*2))*0.7;
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '300 60px "Inter",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(':', cx + hw/2 - 4, cy - 85);
+  ctx.globalAlpha = 1;
+
+  // Seconds
+  const secs = Math.floor(t % 60).toString().padStart(2, '0');
+  ctx.fillStyle = hex; ctx.font = '400 40px "Inter",sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(secs, cx + hw/2 + 6, cy - 20);
+
+  // Divider + date
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(cx-160, cy+80); ctx.lineTo(cx+160, cy+80); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.font = '500 34px "Space Grotesk",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(date, cx, cy + 115);
+
+  // Heart rate
+  const hlx = cx-130, hly = cy+240;
+  ctx.beginPath(); ctx.arc(hlx, hly, 48, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 3; ctx.stroke();
+  const pulse = 0.5+Math.abs(Math.sin(t*3))*0.5;
+  ctx.beginPath(); ctx.arc(hlx, hly, 48, -Math.PI/2, -Math.PI/2+pulse*Math.PI*2);
+  ctx.strokeStyle = '#ff4757'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke(); ctx.lineCap = 'butt';
+  ctx.fillStyle = '#ff4757'; ctx.font = '400 26px "Inter",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('\u2665', hlx, hly-8);
+  ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = '600 22px "Space Grotesk",sans-serif';
+  ctx.fillText(Math.round(72+Math.sin(t*2)*5).toString(), hlx, hly+16);
+
+  // Battery
+  const bx = cx, by = cy+270;
+  ctx.beginPath(); ctx.arc(bx, by, 36, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(bx, by, 36, -Math.PI/2, -Math.PI/2+0.78*Math.PI*2);
+  ctx.strokeStyle = '#2ecc71'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.stroke(); ctx.lineCap = 'butt';
+  ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = '600 20px "Space Grotesk",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('78%', bx, by+2);
+
+  // Steps
+  const srx = cx+130, sry = cy+240;
+  ctx.beginPath(); ctx.arc(srx, sry, 48, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.beginPath(); ctx.arc(srx, sry, 48, -Math.PI/2, -Math.PI/2+0.42*Math.PI*2);
+  ctx.strokeStyle = hex; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke(); ctx.lineCap = 'butt';
+  ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = '600 22px "Space Grotesk",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('4.2k', srx, sry+6);
+
+  // Second dot
+  const sa = -Math.PI/2 + (t%60)*(Math.PI*2/60);
+  ctx.fillStyle = hex; ctx.beginPath();
+  ctx.arc(cx+Math.cos(sa)*460, cy+Math.sin(sa)*460, 5, 0, Math.PI*2); ctx.fill();
+
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════════════
+   FACE 2 — SPORT (Activity Rings like Apple Watch)
+   ══════════════════════════════════════════════════════ */
+function drawSportFace(ctx: CanvasRenderingContext2D, accent: THREE.Color, t: number, time: string, date: string) {
+  const s = 1024, cx = s/2, cy = s/2;
+  const hex = '#' + accent.getHexString();
+  drawBackground(ctx, s, cx, cy);
+
+  // Three concentric activity rings
+  const ringData = [
+    { r: 420, fill: 0.82 + Math.sin(t*0.5)*0.05, color: '#ff3b30', label: 'MOVE', val: '486 CAL' },
+    { r: 370, fill: 0.65 + Math.sin(t*0.7)*0.08, color: '#4cd964', label: 'EXERCISE', val: '32 MIN' },
+    { r: 320, fill: 0.90 + Math.sin(t*0.3)*0.04, color: '#007aff', label: 'STAND', val: '10 HRS' },
+  ];
+
+  ringData.forEach(({ r, fill, color }) => {
+    // Track ring
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 28; ctx.stroke();
+    // Fill ring
+    ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI/2, -Math.PI/2 + fill*Math.PI*2);
+    ctx.strokeStyle = color; ctx.lineWidth = 28; ctx.lineCap = 'round'; ctx.stroke(); ctx.lineCap = 'butt';
+    // End cap glow
+    const ea = -Math.PI/2 + fill*Math.PI*2;
+    const glow = ctx.createRadialGradient(cx+Math.cos(ea)*r, cy+Math.sin(ea)*r, 0, cx+Math.cos(ea)*r, cy+Math.sin(ea)*r, 24);
+    glow.addColorStop(0, color); glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow; ctx.beginPath();
+    ctx.arc(cx+Math.cos(ea)*r, cy+Math.sin(ea)*r, 24, 0, Math.PI*2); ctx.fill();
+  });
+
+  // Time — center, bold
+  const [hrs, mins] = time.split(':');
+  ctx.fillStyle = '#ffffff'; ctx.font = '700 180px "Inter",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(`${hrs}:${mins}`, cx, cy - 10);
+
+  // Seconds
+  const secs = Math.floor(t % 60).toString().padStart(2, '0');
+  ctx.fillStyle = hex; ctx.font = '600 50px "Inter",sans-serif';
+  ctx.fillText(secs, cx, cy + 70);
+
+  // Date below
+  ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '500 30px "Space Grotesk",sans-serif';
+  ctx.fillText(date, cx, cy + 130);
+
+  // Activity labels at bottom
+  ringData.forEach(({ label, val, color }, i) => {
+    const lx = cx - 170 + i * 170;
+    const ly = cy + 210;
+    ctx.fillStyle = color; ctx.font = '600 16px "Space Grotesk",sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(label, lx, ly);
+    ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.font = '500 20px "Space Grotesk",sans-serif';
+    ctx.fillText(val, lx, ly + 24);
+  });
+
+  // HR icon top
+  ctx.fillStyle = '#ff3b30'; ctx.font = '400 34px "Inter",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('\u2665', cx - 100, cy - 180);
+  const bpm = Math.round(128 + Math.sin(t*4)*8);
+  ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = '600 28px "Space Grotesk",sans-serif';
+  ctx.fillText(bpm.toString(), cx - 40, cy - 180);
+
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════════════
+   FACE 3 — CLASSIC (Analog-inspired digital)
+   ══════════════════════════════════════════════════════ */
+function drawClassicFace(ctx: CanvasRenderingContext2D, accent: THREE.Color, t: number, time: string, date: string) {
+  const s = 1024, cx = s/2, cy = s/2;
+  const hex = '#' + accent.getHexString();
+  drawBackground(ctx, s, cx, cy);
+
+  // Elegant outer ring
+  ctx.beginPath(); ctx.arc(cx, cy, 490, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 2; ctx.stroke();
+
+  // Roman numeral positions
+  const romans = ['XII','I','II','III','IV','V','VI','VII','VIII','IX','X','XI'];
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '400 36px "Space Grotesk",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  romans.forEach((num, i) => {
+    const angle = -Math.PI/2 + (i * Math.PI * 2 / 12);
+    const rx = cx + Math.cos(angle) * 440;
+    const ry = cy + Math.sin(angle) * 440;
+    ctx.fillText(num, rx, ry);
+  });
+
+  // Thin indices between Romans
+  ctx.save(); ctx.translate(cx, cy);
+  for (let i = 0; i < 60; i++) {
+    if (i % 5 !== 0) {
+      ctx.beginPath(); ctx.moveTo(0, -470); ctx.lineTo(0, -462);
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1; ctx.stroke();
+    }
+    ctx.rotate(Math.PI/30);
+  }
+  ctx.restore();
+
+  // Inner decorative circle
+  ctx.beginPath(); ctx.arc(cx, cy, 380, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 0.5; ctx.stroke();
+
+  // Brand
+  ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = '400 24px "Space Grotesk",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('F O S S I L', cx, cy - 120);
+
+  // Time — elegant serif-like
+  const [hrs, mins] = time.split(':');
+  ctx.fillStyle = '#ffffff'; ctx.font = '100 200px "Inter",sans-serif';
+  ctx.fillText(`${hrs}:${mins}`, cx, cy + 30);
+
+  // Date window (right side, like a real watch)
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fillRect(cx + 120, cy + 100, 120, 48);
+  ctx.strokeStyle = hex; ctx.lineWidth = 1;
+  ctx.strokeRect(cx + 120, cy + 100, 120, 48);
+  ctx.fillStyle = hex; ctx.font = '600 24px "Space Grotesk",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(date, cx + 180, cy + 124);
+
+  // Accent ring (thin)
+  ctx.beginPath(); ctx.arc(cx, cy, 495, -Math.PI/2, -Math.PI/2 + (0.7+Math.sin(t*0.5)*0.1)*Math.PI*2);
+  ctx.strokeStyle = hex; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.stroke(); ctx.lineCap = 'butt';
+
+  // Sweeping second hand (thin line from center)
+  const sa = -Math.PI/2 + (t % 60) * (Math.PI*2/60);
+  ctx.beginPath(); ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + Math.cos(sa) * 360, cy + Math.sin(sa) * 360);
+  ctx.strokeStyle = hex; ctx.lineWidth = 1; ctx.stroke();
+  // Center dot
+  ctx.fillStyle = hex; ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI*2); ctx.fill();
+
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════════════
+   FACE 4 — TACTICAL (Military / HUD style)
+   ══════════════════════════════════════════════════════ */
+function drawTacticalFace(ctx: CanvasRenderingContext2D, accent: THREE.Color, t: number, time: string, date: string) {
+  const s = 1024, cx = s/2, cy = s/2;
+  const hex = '#' + accent.getHexString();
+  drawBackground(ctx, s, cx, cy);
+
+  // Grid overlay
+  ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 0.5;
+  for (let i = 100; i < s; i += 80) {
+    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(s, i); ctx.stroke();
+  }
+
+  // Concentric range circles
+  [200, 300, 400].forEach(r => {
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 0.5; ctx.stroke();
+  });
+
+  // Crosshair lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(cx, cy-500); ctx.lineTo(cx, cy+500); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx-500, cy); ctx.lineTo(cx+500, cy); ctx.stroke();
+
+  // Compass heading bar (top)
+  ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(cx-200, 60, 400, 50);
+  ctx.strokeStyle = hex; ctx.lineWidth = 1; ctx.strokeRect(cx-200, 60, 400, 50);
+  const heading = Math.round((t * 15) % 360);
+  const dirs = ['N','NE','E','SE','S','SW','W','NW'];
+  const dirIdx = Math.floor(((heading + 22.5) % 360) / 45);
+  ctx.fillStyle = hex; ctx.font = '700 28px "Space Grotesk",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(`${heading}\u00B0 ${dirs[dirIdx]}`, cx, 85);
+
+  // Time — mono/military style (large, centered)
+  const [hrs, mins] = time.split(':');
+  const secs = Math.floor(t % 60).toString().padStart(2, '0');
+  ctx.fillStyle = hex; ctx.font = '700 200px "Space Grotesk",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(`${hrs}:${mins}`, cx, cy - 20);
+
+  // Seconds with label
+  ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '600 50px "Space Grotesk",sans-serif';
+  ctx.fillText(`:${secs}`, cx + 200, cy - 20);
+
+  // Mission elapsed timer
+  const elapsed = Math.floor(t);
+  const mh = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+  const mm = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+  const ms = (elapsed % 60).toString().padStart(2, '0');
+  ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '400 22px "Space Grotesk",sans-serif';
+  ctx.fillText('MISSION ELAPSED', cx, cy + 80);
+  ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '500 30px "Space Grotesk",sans-serif';
+  ctx.fillText(`${mh}:${mm}:${ms}`, cx, cy + 115);
+
+  // Date
+  ctx.fillText(date, cx, cy + 160);
+
+  // Coordinates (bottom)
+  ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = '400 18px "Space Grotesk",sans-serif';
+  ctx.fillText('26.2041\u00B0 S  28.0473\u00B0 E', cx, cy + 280);
+
+  // Battery + signal (bottom-left, bottom-right)
+  ctx.fillStyle = hex; ctx.font = '500 18px "Space Grotesk",sans-serif';
+  ctx.textAlign = 'left'; ctx.fillText('BAT 92%', cx - 220, cy + 320);
+  ctx.textAlign = 'right'; ctx.fillText('SIG 4/5', cx + 220, cy + 320);
+
+  // Scanning sweep line
+  const sweepA = -Math.PI/2 + (t * 0.8) % (Math.PI * 2);
+  ctx.beginPath(); ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + Math.cos(sweepA) * 400, cy + Math.sin(sweepA) * 400);
+  ctx.strokeStyle = accentRgba(accent, 0.15); ctx.lineWidth = 2; ctx.stroke();
+
+  // Blips on radar
+  for (let i = 0; i < 5; i++) {
+    const ba = sweepA - 0.3 - i * 0.15;
+    const bd = 150 + i * 50;
+    const bx = cx + Math.cos(ba) * bd;
+    const by = cy + Math.sin(ba) * bd;
+    ctx.globalAlpha = 0.5 - i * 0.1;
+    ctx.fillStyle = hex; ctx.beginPath(); ctx.arc(bx, by, 3, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════════════
+   FACE 5 — NOIR (Ultra-minimal)
+   ══════════════════════════════════════════════════════ */
+function drawNoirFace(ctx: CanvasRenderingContext2D, accent: THREE.Color, t: number, time: string, date: string) {
+  const s = 1024, cx = s/2, cy = s/2;
+  const hex = '#' + accent.getHexString();
+  drawBackground(ctx, s, cx, cy);
+
+  // Single thin accent ring
+  ctx.beginPath(); ctx.arc(cx, cy, 490, 0, Math.PI*2);
+  ctx.strokeStyle = accentRgba(accent, 0.15); ctx.lineWidth = 1; ctx.stroke();
+
+  // Breathing glow ring
+  const glow = 0.04 + Math.abs(Math.sin(t * 0.6)) * 0.06;
+  const rg = ctx.createRadialGradient(cx, cy, 460, cx, cy, 510);
+  rg.addColorStop(0, 'transparent'); rg.addColorStop(1, accentRgba(accent, glow));
+  ctx.fillStyle = rg; ctx.fillRect(0, 0, s, s);
+
+  // Only 4 minimal indices at 12, 3, 6, 9
+  const positions = [
+    { x: cx, y: cy - 460 },   // 12
+    { x: cx + 460, y: cy },   // 3
+    { x: cx, y: cy + 460 },   // 6
+    { x: cx - 460, y: cy },   // 9
+  ];
+  positions.forEach(p => {
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI*2); ctx.fill();
+  });
+
+  // Time — ultra-large, ultra-light weight, perfectly centered
+  const [hrs, mins] = time.split(':');
+  ctx.fillStyle = '#ffffff'; ctx.font = '100 320px "Inter",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(hrs, cx, cy - 60);
+
+  // Minutes below, slightly bolder
+  ctx.fillStyle = accentRgba(accent, 0.9); ctx.font = '300 120px "Inter",sans-serif';
+  ctx.fillText(mins, cx, cy + 100);
+
+  // Pulsing separator dot
+  ctx.globalAlpha = 0.2 + Math.abs(Math.sin(t * 1.5)) * 0.8;
+  ctx.fillStyle = hex; ctx.beginPath(); ctx.arc(cx, cy + 20, 4, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // Date — minimal
+  ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '300 26px "Space Grotesk",sans-serif';
+  ctx.fillText(date, cx, cy + 220);
+
+  ctx.restore();
+}
+
+/* ── Face dispatcher ────────────────────────────────── */
 
 function drawWatchFace(
   ctx: CanvasRenderingContext2D,
@@ -80,244 +475,15 @@ function drawWatchFace(
   elapsed: number,
   time: string,
   date: string,
+  style: string,
 ) {
-  const s = 1024;
-  const cx = s / 2;
-  const cy = s / 2;
-  const accentHex = '#' + accentColor.getHexString();
-  const r255 = Math.round(accentColor.r * 255);
-  const g255 = Math.round(accentColor.g * 255);
-  const b255 = Math.round(accentColor.b * 255);
-  const accentRgba = (a: number) => `rgba(${r255},${g255},${b255},${a})`;
-
-  // ── Background ──────────────────────────────────────
-  const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 512);
-  bg.addColorStop(0, '#111111');
-  bg.addColorStop(0.8, '#080808');
-  bg.addColorStop(1, '#000000');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, s, s);
-
-  // Clip to circle
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(cx, cy, 500, 0, Math.PI * 2);
-  ctx.clip();
-
-  // ── Edge accent glow ────────────────────────────────
-  const edgeGlow = ctx.createRadialGradient(cx, cy, 380, cx, cy, 510);
-  edgeGlow.addColorStop(0, 'transparent');
-  edgeGlow.addColorStop(1, accentRgba(0.08));
-  ctx.fillStyle = edgeGlow;
-  ctx.fillRect(0, 0, s, s);
-
-  // ── Outer ring ──────────────────────────────────────
-  ctx.beginPath();
-  ctx.arc(cx, cy, 490, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // ── Hour markers ────────────────────────────────────
-  ctx.save();
-  ctx.translate(cx, cy);
-  for (let i = 0; i < 60; i++) {
-    if (i % 5 === 0) {
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.fillRect(-2.5, -488, 5, 22);
-    } else {
-      ctx.beginPath();
-      ctx.arc(0, -480, 1.5, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255,255,255,0.15)';
-      ctx.fill();
-    }
-    ctx.rotate(Math.PI / 30);
+  switch (style) {
+    case 'sport':    drawSportFace(ctx, accentColor, elapsed, time, date); break;
+    case 'classic':  drawClassicFace(ctx, accentColor, elapsed, time, date); break;
+    case 'tactical': drawTacticalFace(ctx, accentColor, elapsed, time, date); break;
+    case 'noir':     drawNoirFace(ctx, accentColor, elapsed, time, date); break;
+    default:         drawLuxuryFace(ctx, accentColor, elapsed, time, date); break;
   }
-  ctx.restore();
-
-  // ── Animated accent arc ─────────────────────────────
-  const arcFill = 0.65 + Math.sin(elapsed * 0.8) * 0.1;
-  ctx.beginPath();
-  ctx.arc(cx, cy, 494, -Math.PI / 2, -Math.PI / 2 + arcFill * Math.PI * 2);
-  ctx.strokeStyle = accentHex;
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.stroke();
-  ctx.lineCap = 'butt';
-
-  // Arc tip glow
-  const tipAngle = -Math.PI / 2 + arcFill * Math.PI * 2;
-  const tipX = cx + Math.cos(tipAngle) * 494;
-  const tipY = cy + Math.sin(tipAngle) * 494;
-  const tipGlow = ctx.createRadialGradient(tipX, tipY, 0, tipX, tipY, 18);
-  tipGlow.addColorStop(0, accentRgba(0.7));
-  tipGlow.addColorStop(1, 'transparent');
-  ctx.fillStyle = tipGlow;
-  ctx.beginPath();
-  ctx.arc(tipX, tipY, 18, 0, Math.PI * 2);
-  ctx.fill();
-
-  // ── FOSSIL branding ─────────────────────────────────
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.font = '500 26px "Space Grotesk", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('F O S S I L', cx, cy - 170);
-
-  // ── TIME (centered) ─────────────────────────────────
-  const [hrs, mins] = time.split(':');
-
-  // Hours — large centered
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '200 260px "Inter", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(hrs, cx, cy - 20);
-
-  // Superscript minutes — positioned top-right of hours
-  ctx.font = '200 260px "Inter", sans-serif';
-  const hWidth = ctx.measureText(hrs).width;
-  ctx.font = '600 100px "Inter", sans-serif';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'top';
-  ctx.fillText(mins, cx + hWidth / 2 + 6, cy - 120);
-
-  // Pulsing colon
-  ctx.globalAlpha = 0.3 + Math.abs(Math.sin(elapsed * 2)) * 0.7;
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.font = '300 60px "Inter", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(':', cx + hWidth / 2 - 4, cy - 85);
-  ctx.globalAlpha = 1;
-
-  // Live seconds in accent color
-  const secs = Math.floor(elapsed % 60).toString().padStart(2, '0');
-  ctx.fillStyle = accentHex;
-  ctx.font = '400 40px "Inter", sans-serif';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(secs, cx + hWidth / 2 + 6, cy - 20);
-
-  // ── Divider ─────────────────────────────────────────
-  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(cx - 160, cy + 80);
-  ctx.lineTo(cx + 160, cy + 80);
-  ctx.stroke();
-
-  // ── Date + label ────────────────────────────────────
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.font = '500 34px "Space Grotesk", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(date, cx, cy + 115);
-
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.font = '300 24px "Inter", sans-serif';
-  ctx.fillText('Smart Harmony', cx, cy + 155);
-
-  // ── Heart rate (bottom-left) ────────────────────────
-  const hlx = cx - 130, hly = cy + 240;
-  ctx.beginPath();
-  ctx.arc(hlx, hly, 48, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  const pulse = 0.5 + Math.abs(Math.sin(elapsed * 3)) * 0.5;
-  ctx.beginPath();
-  ctx.arc(hlx, hly, 48, -Math.PI / 2, -Math.PI / 2 + pulse * Math.PI * 2);
-  ctx.strokeStyle = '#ff4757';
-  ctx.lineWidth = 3;
-  ctx.lineCap = 'round';
-  ctx.stroke();
-  ctx.lineCap = 'butt';
-  ctx.fillStyle = '#ff4757';
-  ctx.font = '400 26px "Inter", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('\u2665', hlx, hly - 8);
-  const bpm = Math.round(72 + Math.sin(elapsed * 2) * 5);
-  ctx.fillStyle = 'rgba(255,255,255,0.85)';
-  ctx.font = '600 22px "Space Grotesk", sans-serif';
-  ctx.fillText(bpm.toString(), hlx, hly + 16);
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.font = '400 13px "Space Grotesk", sans-serif';
-  ctx.fillText('BPM', hlx, hly + 35);
-
-  // ── Battery (bottom-center) ─────────────────────────
-  const bx = cx, by = cy + 270;
-  ctx.beginPath();
-  ctx.arc(bx, by, 36, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(bx, by, 36, -Math.PI / 2, -Math.PI / 2 + 0.78 * Math.PI * 2);
-  ctx.strokeStyle = '#2ecc71';
-  ctx.lineWidth = 2.5;
-  ctx.lineCap = 'round';
-  ctx.stroke();
-  ctx.lineCap = 'butt';
-  ctx.fillStyle = 'rgba(255,255,255,0.85)';
-  ctx.font = '600 20px "Space Grotesk", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('78%', bx, by + 2);
-
-  // ── Steps (bottom-right) ────────────────────────────
-  const srx = cx + 130, sry = cy + 240;
-  ctx.beginPath();
-  ctx.arc(srx, sry, 48, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  const stepsFill = 0.42 + Math.sin(elapsed * 0.3) * 0.05;
-  ctx.beginPath();
-  ctx.arc(srx, sry, 48, -Math.PI / 2, -Math.PI / 2 + stepsFill * Math.PI * 2);
-  ctx.strokeStyle = accentHex;
-  ctx.lineWidth = 3;
-  ctx.lineCap = 'round';
-  ctx.stroke();
-  ctx.lineCap = 'butt';
-  ctx.fillStyle = accentHex;
-  ctx.font = '400 20px "Inter", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('\u26A1', srx, sry - 8);
-  ctx.fillStyle = 'rgba(255,255,255,0.85)';
-  ctx.font = '600 22px "Space Grotesk", sans-serif';
-  ctx.fillText('4.2k', srx, sry + 16);
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.font = '400 13px "Space Grotesk", sans-serif';
-  ctx.fillText('STEPS', srx, sry + 35);
-
-  // ── Sweeping second dot ─────────────────────────────
-  const secA = -Math.PI / 2 + (elapsed % 60) * (Math.PI * 2 / 60);
-  const dx = cx + Math.cos(secA) * 460;
-  const dy = cy + Math.sin(secA) * 460;
-  const dg = ctx.createRadialGradient(dx, dy, 0, dx, dy, 16);
-  dg.addColorStop(0, accentRgba(0.6));
-  dg.addColorStop(1, 'transparent');
-  ctx.fillStyle = dg;
-  ctx.beginPath();
-  ctx.arc(dx, dy, 16, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = accentHex;
-  ctx.beginPath();
-  ctx.arc(dx, dy, 5, 0, Math.PI * 2);
-  ctx.fill();
-
-  // ── Notification beacon (top) ───────────────────────
-  ctx.globalAlpha = 0.2 + Math.abs(Math.sin(elapsed * 1.8)) * 0.8;
-  ctx.fillStyle = accentHex;
-  ctx.beginPath();
-  ctx.arc(cx, cy - 410, 6, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.globalAlpha = 1;
-
-  ctx.restore();
 }
 
 /* ── Watch Component ────────────────────────────────── */
@@ -341,11 +507,10 @@ export function WatchModel(props: WatchModelProps) {
   useEffect(() => {
     screenCanvas.current.width = 1024;
     screenCanvas.current.height = 1024;
-    // Draw initial face immediately so the screen isn't blank
     const ctx = screenCanvas.current.getContext('2d');
     if (ctx) {
       const p = products[0];
-      drawWatchFace(ctx, new THREE.Color(p.accentColor), 0, p.screenTime, p.screenDate);
+      drawWatchFace(ctx, new THREE.Color(p.accentColor), 0, p.screenTime, p.screenDate, p.faceStyle);
       screenTexture.current.needsUpdate = true;
     }
   }, []);
@@ -381,14 +546,14 @@ export function WatchModel(props: WatchModelProps) {
     if (caseMatRef.current) caseMatRef.current.color.copy(watchState.colors.case);
     if (strapMatRef.current) strapMatRef.current.color.copy(watchState.colors.strap);
 
-    // Determine current product index for screen time/date
+    // Determine current product
     const idx = Math.max(0, Math.min(products.length - 1, Math.round(watchState.progress * (products.length - 1))));
     const p = products[idx];
 
-    // Draw face
+    // Draw face with the correct style
     const ctx = screenCanvas.current.getContext('2d');
     if (ctx) {
-      drawWatchFace(ctx, watchState.colors.accent, t, p.screenTime, p.screenDate);
+      drawWatchFace(ctx, watchState.colors.accent, t, p.screenTime, p.screenDate, p.faceStyle);
       screenTexture.current.needsUpdate = true;
     }
   });
@@ -431,7 +596,7 @@ export function WatchModel(props: WatchModelProps) {
           <meshPhysicalMaterial metalness={0.9} roughness={0.5} color="#0a0a0a" />
         </mesh>
 
-        {/* ── Screen (flat disc facing outward) ─────── */}
+        {/* ── Screen ─────────────────── */}
         <mesh position={[0, 0.21, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[1.36, 64]} />
           <meshStandardMaterial

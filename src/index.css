@@ -20,7 +20,6 @@ html {
 
 html, body {
   width: 100%;
-  height: 100%;
   overflow-x: hidden;
 }
 
@@ -45,6 +44,7 @@ html { scrollbar-width: none; }
   z-index: 0;
   background: #8b6f5c;
   transition: background-color 0.05s linear;
+  pointer-events: none;
 }
 
 /* ========================================
@@ -59,6 +59,7 @@ html { scrollbar-width: none; }
   z-index: 1;
   border-radius: 20px;
   overflow: hidden;
+  pointer-events: none;
   /* Dark textured background */
   background:
     radial-gradient(ellipse at 30% 40%, rgba(40,40,40,1) 0%, rgba(26,26,26,1) 60%),
@@ -89,6 +90,7 @@ html { scrollbar-width: none; }
   z-index: 2;
   opacity: 0.7;
   transition: background-color 0.05s linear;
+  pointer-events: none;
 }
 
 /* Right concave circle cutout */
@@ -102,6 +104,7 @@ html { scrollbar-width: none; }
   z-index: 2;
   opacity: 0.4;
   transition: background-color 0.05s linear;
+  pointer-events: none;
 }
 
 /* ========================================
@@ -242,11 +245,10 @@ html { scrollbar-width: none; }
 }
 
 /* ========================================
-   CONTENT PANEL (right of watch)
+   CONTENT PANEL
    ======================================== */
 .content-slide {
   position: fixed;
-  right: 100px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 50;
@@ -255,6 +257,20 @@ html { scrollbar-width: none; }
   opacity: 0;
   transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* When watch is on the left, content goes to the right */
+.content-slide.content-right {
+  right: 100px;
+  left: auto;
+  text-align: left;
+}
+
+/* When watch is on the right, content goes to the left */
+.content-slide.content-left {
+  left: 160px;
+  right: auto;
+  text-align: left;
 }
 
 .content-slide.visible {
@@ -431,7 +447,7 @@ html { scrollbar-width: none; }
 }
 
 .three-canvas canvas {
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 /* ========================================
@@ -455,7 +471,7 @@ html { scrollbar-width: none; }
    ======================================== */
 .scroll-space {
   position: relative;
-  z-index: -1;
+  z-index: 0;
 }
 
 .scroll-space .page {
