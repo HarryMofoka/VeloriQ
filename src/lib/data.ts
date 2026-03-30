@@ -3,7 +3,7 @@ export interface Product {
   name: string;
   subtitle: string;
   description: string;
-  price: string;
+  basePrice: number;
   caseColor: string;
   strapColor: string;
   accentColor: string;
@@ -21,8 +21,8 @@ export const products: Product[] = [
     id: 1,
     name: 'VeloriQ',
     subtitle: 'Super Luxury',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. sed diam nonumy eirmod tempor.',
-    price: '$399',
+    description: 'Meticulously crafted from aerospace-grade titanium and domed sapphire crystal. The absolute pinnacle of modern horology and uncompromising design.',
+    basePrice: 599,
     caseColor: '#1a1a1a',
     strapColor: '#0e0e0e',
     accentColor: '#ff6b6b',
@@ -38,8 +38,8 @@ export const products: Product[] = [
     id: 2,
     name: 'VeloriQ',
     subtitle: 'Sport Active',
-    description: 'Lightweight aluminum case and silicone strap designed for your toughest workouts.',
-    price: '$299',
+    description: 'Ultra-lightweight aluminum chassis engineered perfectly with a breathable fluoroelastomer band. Ready to conquer your toughest elements.',
+    basePrice: 399,
     caseColor: '#2a2a2a',
     strapColor: '#d4844a',
     accentColor: '#e67e22',
@@ -55,8 +55,8 @@ export const products: Product[] = [
     id: 3,
     name: 'VeloriQ',
     subtitle: 'Classic Elegance',
-    description: 'Stainless steel finish with a minimalist digital face respecting traditional craft.',
-    price: '$449',
+    description: 'Timeless artisan craftsmanship meets cutting-edge technology. Hand-polished stainless steel housing an elegant, minimalist digital face.',
+    basePrice: 449,
     caseColor: '#c8c8c8',
     strapColor: '#a0a0a0',
     accentColor: '#5dade2',
@@ -72,8 +72,8 @@ export const products: Product[] = [
     id: 4,
     name: 'VeloriQ',
     subtitle: 'Tactical Stealth',
-    description: 'Matte finish with military-grade durability and extended battery life.',
-    price: '$349',
+    description: 'Built for the shadows. Military-spec durability finished in a matte DLC coating. Equipped with advanced radar navigation and mission timer tracking.',
+    basePrice: 499,
     caseColor: '#2c3e50',
     strapColor: '#1a5c32',
     accentColor: '#2ecc71',
@@ -89,8 +89,8 @@ export const products: Product[] = [
     id: 5,
     name: 'VeloriQ',
     subtitle: 'Midnight Noir',
-    description: 'Pure black ceramic with sapphire crystal glass. Understated luxury redefined.',
-    price: '$549',
+    description: 'Forged entirely from pure black ceramic. A powerful, understated statement of minimalist perfection that breathes quietly on your wrist.',
+    basePrice: 699,
     caseColor: '#0d0d0d',
     strapColor: '#151515',
     accentColor: '#a855f7',

@@ -1,9 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { products } from '../lib/data';
 import { watchState } from '../lib/store';
+import { usePricing } from '../lib/usePricing';
 import { ShoppingCart, User, Search, Menu } from 'lucide-react';
 
 export function HtmlOverlay({ activeSection }: { activeSection: number }) {
+  const { formatPrice } = usePricing();
   const cursorRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
   const cutoutLeftRef = useRef<HTMLDivElement>(null);
@@ -138,8 +140,7 @@ export function HtmlOverlay({ activeSection }: { activeSection: number }) {
             <p className="watch-desc">{p.description}</p>
 
             <button className="cta-btn" id={`cta-btn-${p.id}`}>
-              Add to cart — {p.price}
-              <span className="arrow">\u2192</span>
+              Add to cart — {formatPrice(p.basePrice)}
             </button>
           </div>
         );

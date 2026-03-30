@@ -500,18 +500,22 @@ export function WatchModel(props: WatchModelProps) {
   const metalTex = useMemo(() => createMetalTexture(), []);
   const strapTex = useMemo(() => createStrapTexture(), []);
 
-  // Screen canvas
-  const screenCanvas = useRef(document.createElement('canvas'));
-  const screenTexture = useRef(new THREE.CanvasTexture(screenCanvas.current));
+  // Screen canvas (Memoized to prevent HMR context loss)
+  const screenCanvas = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 1024;
+    return canvas;
+  }, []);
+  const screenTexture = useMemo(() => new THREE.CanvasTexture(screenCanvas), [screenCanvas]);
 
   useEffect(() => {
-    screenCanvas.current.width = 1024;
-    screenCanvas.current.height = 1024;
-    const ctx = screenCanvas.current.getContext('2d');
+    // Canvas sizing is already handled in the useMemo.
+    const ctx = screenCanvas.getContext('2d');
     if (ctx) {
       const p = products[0];
       drawWatchFace(ctx, new THREE.Color(p.accentColor), 0, p.screenTime, p.screenDate, p.faceStyle);
-      screenTexture.current.needsUpdate = true;
+      screenTexture.needsUpdate = true;
     }
   }, []);
 
@@ -551,10 +555,10 @@ export function WatchModel(props: WatchModelProps) {
     const p = products[idx];
 
     // Draw face with the correct style
-    const ctx = screenCanvas.current.getContext('2d');
+    const ctx = screenCanvas.getContext('2d');
     if (ctx) {
       drawWatchFace(ctx, watchState.colors.accent, t, p.screenTime, p.screenDate, p.faceStyle);
-      screenTexture.current.needsUpdate = true;
+      screenTexture.needsUpdate = true;
     }
   });
 
@@ -600,11 +604,11 @@ export function WatchModel(props: WatchModelProps) {
         <mesh position={[0, 0.21, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[1.36, 64]} />
           <meshStandardMaterial
-            map={screenTexture.current}
+            map={screenTexture}
             metalness={0}
             roughness={0.08}
             emissive={new THREE.Color(0xffffff)}
-            emissiveMap={screenTexture.current}
+            emissiveMap={screenTexture}
             emissiveIntensity={3.0}
             toneMapped={false}
           />
