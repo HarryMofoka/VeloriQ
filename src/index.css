@@ -1,0 +1,530 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: #000;
+  color: #fff;
+  font-family: "Space Grotesk", "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide scrollbar */
+::-webkit-scrollbar { width: 0px; background: transparent; }
+html { scrollbar-width: none; }
+
+/* ========================================
+   COLORED BACKDROP (outermost layer)
+   ======================================== */
+.backdrop-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #8b6f5c;
+  transition: background-color 0.05s linear;
+}
+
+/* ========================================
+   DARK PANEL (with concave circle cutouts)
+   ======================================== */
+.dark-panel {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1;
+  border-radius: 20px;
+  overflow: hidden;
+  /* Dark textured background */
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(40,40,40,1) 0%, rgba(26,26,26,1) 60%),
+    linear-gradient(135deg, #1e1e1e 0%, #141414 100%);
+}
+
+/* Leather-like noise texture overlay */
+.dark-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  pointer-events: none;
+}
+
+/* Left concave circle cutout */
+.cutout-left {
+  position: fixed;
+  left: -160px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  z-index: 2;
+  opacity: 0.7;
+  transition: background-color 0.05s linear;
+}
+
+/* Right concave circle cutout */
+.cutout-right {
+  position: fixed;
+  right: -160px;
+  bottom: -40px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  z-index: 2;
+  opacity: 0.4;
+  transition: background-color 0.05s linear;
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  padding: 24px 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-group .hamburger {
+  cursor: pointer;
+  color: #fff;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+
+.brand-group .hamburger:hover { opacity: 1; }
+
+.brand-group h1 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #fff;
+  font-style: italic;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+
+.nav-links a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  position: relative;
+  padding-bottom: 6px;
+  transition: opacity 0.3s;
+}
+
+.nav-links a.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: #fff;
+}
+
+.nav-links a:hover { opacity: 0.6; }
+
+.header-actions {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.header-actions svg {
+  width: 19px;
+  height: 19px;
+  cursor: pointer;
+  color: #fff;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+
+.header-actions svg:hover { opacity: 1; }
+
+/* ========================================
+   STEP INDICATORS (left side)
+   ======================================== */
+.step-nav {
+  position: fixed;
+  left: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.step-entry {
+  position: relative;
+  cursor: pointer;
+  padding: 2px 0;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.step-num {
+  font-variant-numeric: tabular-nums;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.step-entry.inactive .step-num {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.25);
+  line-height: 2;
+}
+
+.step-entry.active .step-num {
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+/* Horizontal strike-through line on active step */
+.step-strike {
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 2px;
+  background: rgba(255,255,255,0.5);
+  pointer-events: none;
+}
+
+/* ========================================
+   CONTENT PANEL (right of watch)
+   ======================================== */
+.content-slide {
+  position: fixed;
+  right: 100px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  max-width: 380px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.content-slide.visible {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.content-slide.hidden-up {
+  transform: translateY(-55%);
+  opacity: 0;
+}
+
+.content-slide.hidden-down {
+  transform: translateY(-45%);
+  opacity: 0;
+}
+
+/* Vertical "SMART WATCH" label */
+.sw-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.sw-label .vline {
+  width: 1.5px;
+  height: 70px;
+  background: rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
+
+.sw-label span {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  font-weight: 500;
+}
+
+/* Title */
+.watch-title {
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.02;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.watch-title .thin {
+  font-weight: 300;
+}
+
+/* Description */
+.watch-desc {
+  font-size: 0.84rem;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.75;
+  margin-bottom: 28px;
+  max-width: 320px;
+}
+
+/* CTA */
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 13px 28px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: "Space Grotesk", sans-serif;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.35s ease;
+}
+
+.cta-btn:hover {
+  background: #fff;
+  color: #111;
+  border-color: #fff;
+}
+
+.cta-btn .arrow {
+  font-size: 1rem;
+  transition: transform 0.3s;
+}
+
+.cta-btn:hover .arrow {
+  transform: translateX(3px);
+}
+
+/* ========================================
+   VERTICAL "WATCH" WATERMARK (far right)
+   ======================================== */
+.watch-watermark {
+  position: fixed;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: clamp(5rem, 11vw, 8.5rem);
+  font-weight: 800;
+  color: rgba(255,255,255,0.03);
+  letter-spacing: 0.12em;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ========================================
+   SOCIAL FOOTER
+   ======================================== */
+.social-links {
+  position: fixed;
+  bottom: 28px;
+  left: 50px;
+  z-index: 50;
+  display: flex;
+  gap: 16px;
+}
+
+.social-links a {
+  color: rgba(255,255,255,0.35);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.social-links a:hover {
+  color: #fff;
+}
+
+/* ========================================
+   SCROLL INDICATOR (bottom right)
+   ======================================== */
+.scroll-indicator {
+  position: fixed;
+  bottom: 28px;
+  right: 50px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.scroll-indicator .line {
+  width: 1px;
+  height: 36px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+  animation: breathePulse 2.5s ease-in-out infinite;
+}
+
+@keyframes breathePulse {
+  0%, 100% { opacity: 0.25; transform: scaleY(1); }
+  50% { opacity: 0.9; transform: scaleY(1.2); }
+}
+
+/* ========================================
+   CANVAS (3D)
+   ======================================== */
+.three-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.three-canvas canvas {
+  pointer-events: auto;
+}
+
+/* ========================================
+   CURSOR GLOW
+   ======================================== */
+.cursor-blob {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999;
+  mix-blend-mode: soft-light;
+  background: radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%);
+}
+
+/* ========================================
+   SCROLL SPACER (invisible)
+   ======================================== */
+.scroll-space {
+  position: relative;
+  z-index: -1;
+}
+
+.scroll-space .page {
+  height: 100vh;
+  width: 100%;
+}
+
+/* ========================================
+   LOADER OVERLAY
+   ======================================== */
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  transition: opacity 0.8s ease;
+}
+
+.loader-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader-bar-track {
+  width: 200px;
+  height: 2px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.loader-bar-fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 1px;
+  transition: width 0.3s ease;
+}
+
+.loader-text {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.2em;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 900px) {
+  .dark-panel { inset: 10px; border-radius: 14px; }
+  .cutout-left { width: 240px; height: 240px; left: -120px; }
+  .cutout-right { width: 200px; height: 200px; right: -100px; }
+  .step-nav { left: 24px; }
+  .content-slide { right: 24px; max-width: 260px; }
+  .site-header { padding: 18px 24px; }
+  .nav-links { display: none; }
+  .watch-watermark { display: none; }
+  .social-links { left: 24px; }
+  .scroll-indicator { right: 24px; }
+}
+
+@media (max-width: 600px) {
+  .step-nav { display: none; }
+  .content-slide { right: 16px; left: 16px; max-width: none; bottom: 60px; top: auto; transform: none; }
+  .content-slide.visible { transform: none; }
+  .cutout-left, .cutout-right { display: none; }
+}
