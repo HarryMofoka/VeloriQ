@@ -26,10 +26,10 @@ export default function App() {
         scrub: 1.2,
         onUpdate: (self) => {
           const progress = self.progress;
-          const section = Math.min(
-            Math.floor(progress * products.length),
+          const section = Math.max(0, Math.min(
+            Math.round(progress * (products.length - 1)),
             products.length - 1
-          );
+          ));
           setActiveSection(section);
           watchState.progress = progress;
         },

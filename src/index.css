@@ -255,8 +255,8 @@ html { scrollbar-width: none; }
   max-width: 380px;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  visibility: hidden;
+  will-change: transform, opacity;
 }
 
 /* When watch is on the left, content goes to the right */
@@ -271,21 +271,6 @@ html { scrollbar-width: none; }
   left: 160px;
   right: auto;
   text-align: left;
-}
-
-.content-slide.visible {
-  pointer-events: auto;
-  opacity: 1;
-}
-
-.content-slide.hidden-up {
-  transform: translateY(-55%);
-  opacity: 0;
-}
-
-.content-slide.hidden-down {
-  transform: translateY(-45%);
-  opacity: 0;
 }
 
 /* Vertical "SMART WATCH" label */

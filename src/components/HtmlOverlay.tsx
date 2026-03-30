@@ -28,6 +28,39 @@ export function HtmlOverlay({ activeSection }: { activeSection: number }) {
       if (backdropRef.current) backdropRef.current.style.backgroundColor = hex;
       if (cutoutLeftRef.current) cutoutLeftRef.current.style.backgroundColor = hex;
       if (cutoutRightRef.current) cutoutRightRef.current.style.backgroundColor = hex;
+
+      const rawStep = watchState.progress * (products.length - 1);
+      const slides = document.querySelectorAll('.content-slide');
+
+      slides.forEach((slide, i) => {
+        const el = slide as HTMLElement;
+        const dist = rawStep - i;
+        const absDist = Math.abs(dist);
+        
+        // Opacity drops to 0 when sliding away by 40% of the interval
+        // That guarantees a dead-zone between 0.4 and 0.6 where text is entirely hidden
+        let opacity = 0;
+        if (absDist < 0.4) {
+          opacity = 1 - (absDist / 0.4);
+          // Ease it using sine for a smoother fade
+          opacity = Math.sin(opacity * (Math.PI / 2));
+        }
+
+        // Float up/down directionably
+        const yOffset = -dist * 60;
+
+        if (opacity > 0) {
+          el.style.opacity = opacity.toString();
+          el.style.transform = `translateY(calc(-50% + ${yOffset}px))`;
+          el.style.pointerEvents = opacity > 0.8 ? 'auto' : 'none';
+          el.style.visibility = 'visible';
+        } else {
+          el.style.opacity = '0';
+          el.style.pointerEvents = 'none';
+          el.style.visibility = 'hidden';
+        }
+      });
+
       raf = requestAnimationFrame(sync);
     };
     raf = requestAnimationFrame(sync);
@@ -89,7 +122,7 @@ export function HtmlOverlay({ activeSection }: { activeSection: number }) {
         return (
           <div
             key={p.id}
-            className={`content-slide ${contentSide} ${isActive ? 'visible' : i < activeSection ? 'hidden-up' : 'hidden-down'}`}
+            className={`content-slide ${contentSide}`}
           >
             <div className="sw-label">
               <div className="vline" />
